@@ -1,9 +1,10 @@
 module Main
 
-import Day1.Day1
+-- To solve a part for a day, import Day#.Part#
+import Day2.Part2
 import Helpers.Helpers
 
 main : IO ()
 main = do
-  list <- (Helpers.parseFile "Day1/input.txt")
+  list <- (parseFile "Day2/input.txt")
   printLn (solve list)
