@@ -28,6 +28,5 @@ func Solve2() {
 			}
 		}
 	}
-	fmt.Println(final)
 	fmt.Println(final.SumUnmarked(), finalNum, final.SumUnmarked()*finalNum)
 }
