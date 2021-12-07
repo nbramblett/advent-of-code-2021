@@ -6,6 +6,7 @@ import (
 	"math"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/nbramblett/advent-of-code-2021/gohelp"
 )
@@ -13,23 +14,29 @@ import (
 var distanceMetric func(x, y int) int
 
 func Solve1() {
+	now := time.Now()
 	vals := ReadInput()
 	distanceMetric = func(x, y int) int {
 		return int(math.Abs(float64(x - y)))
 	}
 	od := optimizeDistance(vals)
+	elapsed := time.Since(now)
 	log.Println(od)
+	log.Printf("Day 6 part 1 actual calculations took %s", elapsed)
 }
 
 func optimizeDistance(vals []int) int {
 	min, max := gohelp.MinMax(vals...)
 	optimalDistance := math.MaxInt32
+	optimalTarget := 0
 	for i := min; i <= max; i++ {
 		od := totalDistance(i, vals)
 		if optimalDistance > od {
 			optimalDistance = od
+			optimalTarget = i
 		}
 	}
+	log.Println(optimalTarget)
 	return optimalDistance
 }
 
@@ -42,7 +49,7 @@ func totalDistance(target int, vals []int) int {
 }
 
 func ReadInput() []int {
-	file, err := os.Open("day7/input.txt")
+	file, err := os.Open("day7/input2.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
