@@ -96,6 +96,7 @@ func deduceLines(inputs string) map[rune]RuneSet {
 		}
 	}
 
+	// if you do '7' - '1', the only bit left is the top bar. So finding S_7 - S_1 gives us the character that aligns with 'a'
 	threeTwoDisjunct := Minus(NewRuneSet([]rune(three)...), NewRuneSet([]rune(two)...))
 	options[threeTwoDisjunct.ToSlice()[0]] = NewRuneSet('a')
 	// Handle 6-length first. d, e, f
