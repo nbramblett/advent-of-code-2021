@@ -45,7 +45,7 @@ func LowPoints(grid [][]int) []int {
 }
 
 func ReadInput() [][]int {
-	file, err := os.Open("day9/input3.txt")
+	file, err := os.Open("day9/input.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
