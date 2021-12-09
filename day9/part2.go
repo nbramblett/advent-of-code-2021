@@ -3,12 +3,19 @@ package day9
 import (
 	"log"
 	"math"
+	"time"
+
+	"github.com/eapache/queue"
 )
 
 func Solve2() {
 	grid := ReadInput()
+	start := time.Now()
 	lowPoints := LowCoords(grid)
-	log.Println(Basins(grid, lowPoints))
+	basins := Basins(grid, lowPoints)
+	end := time.Since(start)
+	log.Println(basins)
+	log.Printf("Time taken: %s", end)
 }
 
 func LowCoords(grid [][]int) [][]int {
@@ -62,23 +69,24 @@ type Vector struct {
 
 // Literally just breadth-first search. Start at a low point and go outward, stopping when you hit 9 or an OOB (and ignoring repeats ofc)
 func Basin(grid [][]int, lowI, lowK int) int {
-	queue := []Vector{{lowI, lowK}}
+	q := queue.New()
+	q.Add(Vector{lowI, lowK})
 	visited := map[Vector]bool{}
-	for len(queue) != 0 {
-		i, k := queue[0].i, queue[0].k
+	for q.Length() != 0 {
+		vec := q.Remove().(Vector)
+		i, k := vec.i, vec.k
 		visited[Vector{i, k}] = true
-		queue = queue[1:]
 		if k > 0 && grid[i][k-1] != 9 && !visited[Vector{i, k - 1}] {
-			queue = append(queue, Vector{i, k - 1})
+			q.Add(Vector{i, k - 1})
 		}
 		if k < len(grid[i])-1 && grid[i][k+1] != 9 && !visited[Vector{i, k + 1}] {
-			queue = append(queue, Vector{i, k + 1})
+			q.Add(Vector{i, k + 1})
 		}
 		if i > 0 && grid[i-1][k] != 9 && !visited[Vector{i - 1, k}] {
-			queue = append(queue, Vector{i - 1, k})
+			q.Add(Vector{i - 1, k})
 		}
 		if i < len(grid)-1 && grid[i+1][k] != 9 && !visited[Vector{i + 1, k}] {
-			queue = append(queue, Vector{i + 1, k})
+			q.Add(Vector{i + 1, k})
 		}
 	}
 	return len(visited)
