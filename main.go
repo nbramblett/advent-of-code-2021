@@ -12,5 +12,5 @@ func main() {
 	day9.Solve1()
 	day9.Solve2()
 	elapsed := time.Since(start)
-	log.Printf("Day 7 took %s", elapsed)
+	log.Printf("Day 9 took %s", elapsed)
 }
