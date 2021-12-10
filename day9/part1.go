@@ -58,5 +58,4 @@ func ReadInput() [][]int {
 		lines = append(lines, gohelp.StringsToInts(strings.Split(scanner.Text(), "")))
 	}
 	return lines
-	panic("no line!")
 }

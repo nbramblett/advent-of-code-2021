@@ -4,13 +4,13 @@ import (
 	"log"
 	"time"
 
-	"github.com/nbramblett/advent-of-code-2021/day9"
+	"github.com/nbramblett/advent-of-code-2021/day10"
 )
 
 func main() {
 	start := time.Now()
-	day9.Solve1()
-	day9.Solve2()
+	day10.Solve1()
+	day10.Solve2()
 	elapsed := time.Since(start)
 	log.Printf("Day 9 took %s", elapsed)
 }
