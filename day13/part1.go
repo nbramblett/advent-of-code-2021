@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/nbramblett/advent-of-code-2021/gohelp"
+	"github.com/nbramblett/advent-of-code-2021/util"
 )
 
 func Solve1() {
@@ -70,7 +70,7 @@ func ReadLines() Paper {
 	// first line of input is the numbers to read
 	paper := Paper{}
 	for scanner.Scan() {
-		coords := gohelp.StringsToInts(strings.Split(scanner.Text(), ","))
+		coords := util.StringsToInts(strings.Split(scanner.Text(), ","))
 		paper[Point{coords[0], coords[1]}] = true
 	}
 	return paper

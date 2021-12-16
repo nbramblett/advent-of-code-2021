@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/nbramblett/advent-of-code-2021/gohelp"
+	"github.com/nbramblett/advent-of-code-2021/util"
 )
 
 func Solve1() {
@@ -102,7 +102,7 @@ func ReadLines() [][]int {
 	// first line of input is the numbers to read
 	grid := [][]int{}
 	for scanner.Scan() {
-		points := gohelp.StringsToInts(strings.Split(scanner.Text(), ""))
+		points := util.StringsToInts(strings.Split(scanner.Text(), ""))
 		grid = append(grid, points)
 	}
 	return grid

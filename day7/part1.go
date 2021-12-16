@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nbramblett/advent-of-code-2021/gohelp"
+	"github.com/nbramblett/advent-of-code-2021/util"
 )
 
 var distanceMetric func(x, y int) int
@@ -26,7 +26,7 @@ func Solve1() {
 }
 
 func optimizeDistance(vals []int) int {
-	min, max := gohelp.MinMax(vals...)
+	min, max := util.MinMax(vals...)
 	optimalDistance := math.MaxInt32
 	optimalTarget := 0
 	for i := min; i <= max; i++ {
@@ -59,7 +59,7 @@ func ReadInput() []int {
 	// first line of input is the numbers to read
 	for scanner.Scan() {
 		line := scanner.Text()
-		return gohelp.StringsToInts(strings.Split(line, ","))
+		return util.StringsToInts(strings.Split(line, ","))
 	}
 	panic("no line!")
 }

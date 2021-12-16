@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/nbramblett/advent-of-code-2021/gohelp"
+	"github.com/nbramblett/advent-of-code-2021/util"
 )
 
 func Solve1() {
@@ -55,7 +55,7 @@ func ReadInput() [][]int {
 	// first line of input is the numbers to read
 	lines := [][]int{}
 	for scanner.Scan() {
-		lines = append(lines, gohelp.StringsToInts(strings.Split(scanner.Text(), "")))
+		lines = append(lines, util.StringsToInts(strings.Split(scanner.Text(), "")))
 	}
 	return lines
 }

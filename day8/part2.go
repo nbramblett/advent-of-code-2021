@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/nbramblett/advent-of-code-2021/gohelp"
+	"github.com/nbramblett/advent-of-code-2021/util"
 )
 
 var baseCodes = map[string]int{
@@ -32,7 +32,7 @@ func Solve2() {
 	log.Println(sum)
 }
 
-func convertNumber(inputs []string, opts map[rune]gohelp.RuneSet) int {
+func convertNumber(inputs []string, opts map[rune]util.RuneSet) int {
 	place := 1000
 	value := 0
 	for _, input := range inputs {
@@ -42,14 +42,14 @@ func convertNumber(inputs []string, opts map[rune]gohelp.RuneSet) int {
 	return value
 }
 
-func convertDigit(input string, opts map[rune]gohelp.RuneSet) int {
+func convertDigit(input string, opts map[rune]util.RuneSet) int {
 	output := []rune{}
 	for _, char := range input {
 		output = append(output, opts[char].ToSlice()...)
 	}
 
 	for str, v := range baseCodes {
-		if reflect.DeepEqual(gohelp.NewRuneSet([]rune(str)...), gohelp.NewRuneSet(output...)) {
+		if reflect.DeepEqual(util.NewRuneSet([]rune(str)...), util.NewRuneSet(output...)) {
 			return v
 		}
 	}
@@ -58,8 +58,8 @@ func convertDigit(input string, opts map[rune]gohelp.RuneSet) int {
 	return 10000
 }
 
-func deduceLines(inputs string) map[rune]gohelp.RuneSet {
-	options := map[rune]gohelp.RuneSet{}
+func deduceLines(inputs string) map[rune]util.RuneSet {
+	options := map[rune]util.RuneSet{}
 	fiveLengths := []string{}
 	sixLengths := []string{}
 	three := ""
@@ -67,7 +67,7 @@ func deduceLines(inputs string) map[rune]gohelp.RuneSet {
 	// Fill in blank options
 	for _, cha := range "abcdefg" {
 		if _, ok := options[cha]; !ok {
-			options[cha] = gohelp.NewRuneSet([]rune("abcdefg")...)
+			options[cha] = util.NewRuneSet([]rune("abcdefg")...)
 		}
 	}
 	for _, number := range strings.Split(inputs, " ") {
@@ -79,16 +79,16 @@ func deduceLines(inputs string) map[rune]gohelp.RuneSet {
 		case 2: // 1
 			for _, cha := range number {
 				two = number
-				options[cha] = gohelp.Intersection(options[cha], gohelp.NewRuneSet('c', 'f'))
+				options[cha] = util.Intersection(options[cha], util.NewRuneSet('c', 'f'))
 			}
 		case 3: // 7
 			for _, cha := range number {
 				three = number
-				options[cha] = gohelp.Intersection(options[cha], gohelp.NewRuneSet('a', 'c', 'f'))
+				options[cha] = util.Intersection(options[cha], util.NewRuneSet('a', 'c', 'f'))
 			}
 		case 4: // 4
 			for _, cha := range number {
-				options[cha] = gohelp.Intersection(options[cha], gohelp.NewRuneSet('b', 'c', 'd', 'f'))
+				options[cha] = util.Intersection(options[cha], util.NewRuneSet('b', 'c', 'd', 'f'))
 			}
 		case 5:
 			fiveLengths = append(fiveLengths, number)
@@ -98,38 +98,38 @@ func deduceLines(inputs string) map[rune]gohelp.RuneSet {
 	}
 
 	// if you do '7' - '1', the only bit left is the top bar. So finding S_7 - S_1 gives us the character that aligns with 'a'
-	threeTwoDisjunct := gohelp.Minus(gohelp.NewRuneSet([]rune(three)...), gohelp.NewRuneSet([]rune(two)...))
-	options[threeTwoDisjunct.ToSlice()[0]] = gohelp.NewRuneSet('a')
+	threeTwoDisjunct := util.Minus(util.NewRuneSet([]rune(three)...), util.NewRuneSet([]rune(two)...))
+	options[threeTwoDisjunct.ToSlice()[0]] = util.NewRuneSet('a')
 	// Handle 6-length first. d, e, f
 	if len(sixLengths) > 0 {
-		uniqueChars := gohelp.NewRuneSet()
+		uniqueChars := util.NewRuneSet()
 		for _, s := range sixLengths {
 			for _, s2 := range sixLengths {
-				uniqueChars = gohelp.Union(uniqueChars, gohelp.Disjunction(gohelp.NewRuneSet([]rune(s2)...), gohelp.NewRuneSet([]rune(s)...)))
+				uniqueChars = util.Union(uniqueChars, util.Disjunction(util.NewRuneSet([]rune(s2)...), util.NewRuneSet([]rune(s)...)))
 			}
 		}
 		for char := range uniqueChars {
-			options[char] = gohelp.Intersection(options[char], gohelp.NewRuneSet('d', 'e', 'c'))
+			options[char] = util.Intersection(options[char], util.NewRuneSet('d', 'e', 'c'))
 		}
 	}
 
 	// Handle 5-lengths next - there's 3 sets of variant characters. Find the conflicting characters and remove options. Only e, f, b, g, and c are viable
 	if len(fiveLengths) > 1 {
-		uniqueChars := gohelp.NewRuneSet()
+		uniqueChars := util.NewRuneSet()
 		for _, s := range fiveLengths {
 			// if we subtract one from the five-lengths and get 3 characters remaining (rather than 4), we found 5, and know that 'adg' is left
-			if set := gohelp.Minus(gohelp.NewRuneSet([]rune(s)...), gohelp.NewRuneSet([]rune(two)...)); len(set) == 3 {
+			if set := util.Minus(util.NewRuneSet([]rune(s)...), util.NewRuneSet([]rune(two)...)); len(set) == 3 {
 				for char := range set {
-					options[char] = gohelp.Intersection(options[char], gohelp.NewRuneSet('a', 'd', 'g'))
+					options[char] = util.Intersection(options[char], util.NewRuneSet('a', 'd', 'g'))
 				}
 			}
 			for _, s2 := range fiveLengths {
-				uniqueChars = gohelp.Union(uniqueChars, gohelp.Disjunction(gohelp.NewRuneSet([]rune(s2)...), gohelp.NewRuneSet([]rune(s)...)))
+				uniqueChars = util.Union(uniqueChars, util.Disjunction(util.NewRuneSet([]rune(s2)...), util.NewRuneSet([]rune(s)...)))
 			}
 		}
 
 		for char := range uniqueChars {
-			options[char] = gohelp.Intersection(options[char], gohelp.NewRuneSet('b', 'c', 'e', 'f', 'g'))
+			options[char] = util.Intersection(options[char], util.NewRuneSet('b', 'c', 'e', 'f', 'g'))
 		}
 	}
 
@@ -144,7 +144,7 @@ func deduceLines(inputs string) map[rune]gohelp.RuneSet {
 	return options
 }
 
-func eliminateSingletons(options map[rune]gohelp.RuneSet) {
+func eliminateSingletons(options map[rune]util.RuneSet) {
 	for cha, opts := range options {
 		if len(opts) == 1 {
 			recurse := false
@@ -154,7 +154,7 @@ func eliminateSingletons(options map[rune]gohelp.RuneSet) {
 				}
 				if o2.Contains(opts.ToSlice()[0]) && len(o2) > 1 {
 					recurse = true
-					options[c2] = gohelp.Minus(o2, opts)
+					options[c2] = util.Minus(o2, opts)
 				}
 			}
 			if recurse {

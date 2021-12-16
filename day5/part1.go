@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/nbramblett/advent-of-code-2021/gohelp"
+	"github.com/nbramblett/advent-of-code-2021/util"
 )
 
 func Solve1() {
@@ -45,12 +45,12 @@ func (l Line) Cover() []Point {
 	}
 	points := []Point{}
 	if l.x1 == l.x2 {
-		start, end := gohelp.MinMax(l.y1, l.y2)
+		start, end := util.MinMax(l.y1, l.y2)
 		for i := start; i <= end; i++ {
 			points = append(points, Point{l.x1, i})
 		}
 	} else {
-		start, end := gohelp.MinMax(l.x1, l.x2)
+		start, end := util.MinMax(l.x1, l.x2)
 		for i := start; i <= end; i++ {
 			points = append(points, Point{i, l.y1})
 		}
@@ -78,8 +78,8 @@ func ReadInput() []Line {
 		if len(coords) != 2 {
 			continue
 		}
-		start := gohelp.StringsToInts(strings.Split(coords[0], ","))
-		end := gohelp.StringsToInts(strings.Split(coords[1], ","))
+		start := util.StringsToInts(strings.Split(coords[0], ","))
+		end := util.StringsToInts(strings.Split(coords[1], ","))
 		lines = append(lines, Line{x1: start[0], y1: start[1], x2: end[0], y2: end[1]})
 	}
 	return lines

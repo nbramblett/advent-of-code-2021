@@ -1,4 +1,4 @@
-package gohelp
+package util
 
 import "strconv"
 
