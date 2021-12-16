@@ -14,7 +14,7 @@ func Contains[T comparable](s []T, k T) bool {
 
 // O(log n) time, only works on ordered
 func BinarySearch[T constraints.Ordered](s []T, k T) int {
-	a, b := 0, len(s)
+	a, b := 0, len(s)-1
 	for a < b {
 		m := (a + b) / 2
 		if s[m] == k {

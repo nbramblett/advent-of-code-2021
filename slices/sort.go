@@ -15,7 +15,7 @@ func Sorted[T constraints.Ordered](s []T) bool {
 func Sort[T constraints.Ordered](s []T) {
 	for i := range s {
 		for j := range s {
-			if s[j] < s[i] {
+			if s[i] < s[j] {
 				st := s[i]
 				s[i] = s[j]
 				s[j] = st
@@ -28,7 +28,7 @@ func Sort[T constraints.Ordered](s []T) {
 func SortF[T any](s []T, less func(T, T) bool) {
 	for i := range s {
 		for j := range s {
-			if less(s[j], s[i]) {
+			if less(s[i], s[j]) {
 				st := s[i]
 				s[i] = s[j]
 				s[j] = st
