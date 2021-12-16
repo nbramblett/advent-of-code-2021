@@ -2,6 +2,12 @@ package util
 
 import "strconv"
 
+func PanicIf(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+
 func StringsToInts(strs []string) []int {
 	ints := []int{}
 	for _, i := range strs {
