@@ -1,9 +1,7 @@
 package day17
 
 import (
-	"bufio"
 	"log"
-	"os"
 
 	"github.com/nbramblett/advent-of-code-2021/sets"
 )
@@ -86,20 +84,4 @@ func XAfterNSteps(svx, n int) int {
 
 func YAfterNSteps(svy, n int) int {
 	return svy*(svy+1)/2 - (svy-n)*(svy-n+1)/2
-}
-
-func ReadLines() []string {
-	file, err := os.Open("day17/input.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-	// first line of input is the numbers to read
-	bits := []string{}
-	for scanner.Scan() {
-		bits = append(bits, scanner.Text())
-	}
-	return bits
 }
