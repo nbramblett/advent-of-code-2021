@@ -1,6 +1,11 @@
 package util
 
-import "strconv"
+import (
+	"bufio"
+	"log"
+	"os"
+	"strconv"
+)
 
 func PanicIf(err error) {
 	if err != nil {
@@ -34,4 +39,20 @@ func MinMax(vars ...int) (int, int) {
 	}
 
 	return min, max
+}
+
+func ReadLines(filepath string) []string {
+	file, err := os.Open(filepath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	// first line of input is the numbers to read
+	nodes := []string{}
+	for scanner.Scan() {
+		nodes = append(nodes, scanner.Text())
+	}
+	return nodes
 }
