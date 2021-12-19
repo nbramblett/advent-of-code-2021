@@ -12,16 +12,13 @@ import (
 func Solve1() {
 	lines := util.ReadLines("day19/sampleinput.txt")
 	scanners := ReadScanners(lines)
-	log.Println(len(scanners))
-	log.Println(UniqueRelativeToFirst(scanners[0], scanners[1]))
-
 	finalResult := sets.Set[Coordinate]{}
 	// All of scanner 0 is counted
-	// finalResult.Add(scanners[0]...)
-	// for i := 1; i < len(scanners); i++ {
-	// 	u := UniqueRelativeToFirst(finalResult.ToSlice(), scanners[i])
-	// 	finalResult.Add(u...)
-	// }
+	finalResult.Add(scanners[0]...)
+	for i := 1; i < len(scanners); i++ {
+		u := UniqueRelativeToFirst(finalResult.ToSlice(), scanners[i])
+		finalResult.Add(u...)
+	}
 	log.Println(len(finalResult))
 }
 
@@ -65,16 +62,16 @@ func Offset(s Scanner, c Coordinate) Scanner {
 func UniqueRelativeToFirst(s1, s2 Scanner) Scanner {
 	s1Set := sets.New(s1...)
 	unique := sets.New(s2...)
-	variousOrientationsOfS2 := make([]Scanner, 48)
+	variousOrientationsOfS2 := make([]Scanner, 8)
 	var delta Coordinate
 	for _, c := range s2 {
 		for i, c2 := range Rotations(Orientations(c)...) {
 			variousOrientationsOfS2[i] = append(variousOrientationsOfS2[i], c2)
 		}
 	}
+OUTER:
 	for _, c := range s1 {
 		for _, ss2 := range variousOrientationsOfS2 {
-			log.Println(ss2)
 			for _, c2 := range ss2 {
 				uniqueish := sets.Set[Coordinate]{}
 				comm := 0
@@ -83,12 +80,13 @@ func UniqueRelativeToFirst(s1, s2 Scanner) Scanner {
 					cc2 := cc.Translate(delta)
 					if s1Set.Contains(cc2) {
 						comm++
+					} else {
+						uniqueish.Add(cc2)
 					}
-					uniqueish.Add(cc2)
 				}
-				log.Println(uniqueish)
 				if comm >= 12 {
 					unique = uniqueish
+					break OUTER
 				}
 			}
 		}
@@ -114,21 +112,21 @@ func (c Coordinate) Translate(motion Coordinate) Coordinate {
 
 func Orientations(c Coordinate) []Coordinate {
 	return []Coordinate{
-		// {c.x, c.y, c.z},
-		// {-c.x, c.y, c.z},
-		// {c.x, -c.y, c.z},
-		// {c.x, c.y, -c.z},
-		// {-c.x, -c.y, c.z},
+		{c.x, c.y, c.z},
+		{-c.x, c.y, c.z},
+		{c.x, -c.y, c.z},
+		{c.x, c.y, -c.z},
+		{-c.x, -c.y, c.z},
 		{-c.x, c.y, -c.z},
-		// {c.x, -c.y, -c.z},
-		// {-c.x, -c.y, -c.z},
+		{c.x, -c.y, -c.z},
+		{-c.x, -c.y, -c.z},
 	}
 }
 
 func Rotations(coords ...Coordinate) []Coordinate {
-	cs := sets.Set[Coordinate]{}
+	cs := []Coordinate{}
 	for _, c := range coords {
-		cs.Add(Coordinate{c.x, c.y, c.z})
+		cs = append(cs, Coordinate{c.x, c.y, c.z})
 	}
-	return cs.ToSlice()
+	return cs
 }
