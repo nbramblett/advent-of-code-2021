@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/nbramblett/advent-of-code-2021/sets"
-	"github.com/nbramblett/advent-of-code-2021/slices"
 	"github.com/nbramblett/advent-of-code-2021/util"
 )
 
@@ -15,73 +14,56 @@ var acceptableLevels = 12
 func Solve1() {
 	lines := util.ReadLines("day19/input.txt")
 	scanners := ReadScanners(lines)
-	log.Println(UniqueRelativeToFirst(scanners[0], scanners[1]))
 
-	finalResult := Evaluate(scanners)
+	finalResult, deltas := Evaluate(scanners)
+	maxDistance := 0
+	for _, d1 := range deltas {
+		for _, d2 := range deltas {
+			dist := abs(d1.x-d2.x) + abs(d1.y-d2.y) + abs(d1.z-d2.z)
+			if dist > maxDistance {
+				maxDistance = dist
+			}
+		}
+	}
 	log.Println(len(finalResult))
+	log.Println(maxDistance)
 }
 
-func Evaluate(scanners []Scanner) []Coordinate {
+func Evaluate(scanners []Scanner) ([]Coordinate, []Coordinate) {
 	finalResult := sets.Set[Coordinate]{}
 	// All of scanner 0 is counted
 	finalResult.Add(scanners[0]...)
-	reevaluate := slices.Queue[int]{}
+	deltas := []Coordinate{}
+	convertedScanners := []Scanner{scanners[0]}
 	for i := 1; i < len(scanners); i++ {
-		uniqueSet := sets.New(scanners[i]...)
-		foundMatch := false
-		for j := 0; j < i; j++ {
-			if slices.Contains(reevaluate, j) {
-				continue
-			}
+		log.Println(len(convertedScanners))
+		uniqueSet := sets.New[Coordinate]()
+		jlen := len(convertedScanners)
+		matchedAny := false
+		for j := 0; j < jlen; j++ {
 			//log.Println("comparing", j, i)
-			uniques, _ := UniqueRelativeToFirst(scanners[j], scanners[i])
+			uniques, total, delta := UniqueRelativeToFirst(convertedScanners[j], scanners[i])
 			if uniques != nil {
-				foundMatch = true
 				us := sets.New(uniques...)
 				//log.Println("matched!", us)
-				uniqueSet = sets.Intersection(uniqueSet, us)
+				if uniqueSet.Len() == 0 {
+					uniqueSet = us
+					convertedScanners = append(convertedScanners, total)
+					matchedAny = true
+					deltas = append(deltas, delta)
+				} else {
+					uniqueSet = sets.Intersection(uniqueSet, us)
+				}
 			}
 		}
-		if !foundMatch {
-			//.Println("failed to match", i)
-			reevaluate.Push(i)
+		if !matchedAny {
+			scanners = append(scanners, scanners[i])
 			continue
 		}
 		//log.Println("unique count", i, uniqueSet.Len())
 		finalResult.Add(uniqueSet.ToSlice()...)
 	}
-	bounce := 0
-	for len(reevaluate) != 0 {
-		s := reevaluate.Pop()
-		//log.Println("retrying", s)
-		uniqueSet := sets.New(scanners[s]...)
-		foundMatch := false
-		for i := 0; i < len(scanners); i++ {
-			if slices.Contains(reevaluate, i) || i == s {
-				continue
-			}
-			uniques, _ := UniqueRelativeToFirst(scanners[i], scanners[s])
-			if uniques != nil {
-				foundMatch = true
-				us := sets.New(uniques...)
-				uniqueSet = sets.Intersection(uniqueSet, us)
-			}
-		}
-		if !foundMatch {
-			log.Println("failed to match again", s)
-			bounce++
-			reevaluate.Push(s)
-			if len(reevaluate) < bounce {
-				panic("breaking infinite failure loop")
-			}
-			continue
-		}
-		bounce = 0
-		//log.Println("unique count", s, uniqueSet.Len())
-		finalResult.Add(uniqueSet.ToSlice()...)
-		log.Println(len(reevaluate))
-	}
-	return finalResult.ToSlice()
+	return finalResult.ToSlice(), deltas
 }
 
 func ReadScanners(lines []string) []Scanner {
@@ -117,39 +99,43 @@ func Offset(s Scanner, c Coordinate) Scanner {
 	return s2
 }
 
-func UniqueRelativeToFirst(s1, s2 Scanner) (Scanner, Coordinate) {
+func UniqueRelativeToFirst(s1, s2 Scanner) (Scanner, Scanner, Coordinate) {
 	s1Set := sets.New(s1...)
 	unique := sets.New(s2...)
 	variousOrientationsOfS2 := RotateScanner(s2)
 	foundMatching := false
 	var delta Coordinate
+	var convertedS2 sets.Set[Coordinate]
 OUTER:
 	for _, c := range s1 {
 		for _, ss2 := range variousOrientationsOfS2 {
 			for _, c2 := range ss2 {
 				uniqueish := sets.Set[Coordinate]{}
+				totalish := sets.Set[Coordinate]{}
 				comm := 0
 				delta = Coordinate{c.x - c2.x, c.y - c2.y, c.z - c2.z}
-				for i, cc := range ss2 {
+				for _, cc := range ss2 {
 					cc2 := cc.Translate(delta)
+					totalish.Add(cc2)
 					if s1Set.Contains(cc2) {
 						comm++
 					} else {
-						uniqueish.Add(s2[i])
+						uniqueish.Add(cc2)
 					}
 				}
 				if comm >= acceptableLevels {
 					foundMatching = true
 					unique = uniqueish
+					convertedS2 = totalish
 					break OUTER
 				}
 			}
 		}
 	}
 	if !foundMatching {
-		return nil, delta
+		return nil, nil, Coordinate{}
 	}
-	return unique.ToSlice(), delta
+	return unique.ToSlice(), convertedS2.ToSlice(), delta
 }
 
 type Coordinate struct {
@@ -173,7 +159,7 @@ func Rotations(c Coordinate) []Coordinate {
 		{-c.x, -c.y, c.z},
 		{-c.x, c.z, c.y},
 		{-c.x, c.y, -c.z},
-		{-c.x, -c.z, c.y},
+		{-c.x, -c.z, -c.y},
 
 		{c.y, -c.x, c.z},
 		{c.y, c.z, c.x},
@@ -203,4 +189,8 @@ func RotateScanner(s Scanner) []Scanner {
 		}
 	}
 	return ss
+}
+
+func abs(i int) int {
+	return int(math.Abs(float64(i)))
 }

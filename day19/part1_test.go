@@ -6,6 +6,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestRotate(t *testing.T) {
+	cs := Rotations(Coordinate{1, 2, 3})
+	assert.Len(t, cs, 24)
+	for i := 0; i < 24; i++ {
+		for j := 0; j < 24; j++ {
+			if i != j {
+				assert.NotEqual(t, Coordinate{0, 0, 0}, cs[j])
+				assert.NotEqual(t, cs[i], cs[j])
+			}
+		}
+	}
+}
 func TestRotateScanner(t *testing.T) {
 	testScanner := Scanner{{1, 2, 3}, {2, 3, 4}}
 
